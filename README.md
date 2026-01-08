@@ -89,6 +89,7 @@ For further analysis, only these tournaments will be considered.
 ## Which teams dominated different eras of football
 
 We divide the dataset into football eras and analyze the results for different periods:
+
 ```python
     FOOTBALL_ERAS = [1950, 1960, 1975, 1990, 2005, 2015, 2025]
     for start, end in zip(FOOTBALL_ERAS, FOOTBALL_ERAS[1:]): 
@@ -100,26 +101,31 @@ We divide the dataset into football eras and analyze the results for different p
 ```
 
 ![Top 10 country for number of wins from 1950 to 1960](plots/top_10_country_for_number_of_wins_from_1950_to_1960.png)
+
 ![Top 10 country for percent of wins from 1950 to 1960](plots/top_10_country_for_percent_of_wins_from_1950_to_1960.png)
 
 In the classical era, both in terms of total wins and win percentage, Brazil, Argentina, and Uruguay clearly dominated with a significant margin.
 
 ![Top 10 country for number of wins from 1960 to 1975](plots/top_10_country_for_number_of_wins_from_1960_to_1975.png)
+
 ![Top 10 country for percent of wins from 1960 to 1975](plots/top_10_country_for_percent_of_wins_from_1960_to_1975.png)
 
 Between 1960 and 1975, the Soviet bloc dominated in terms of wins, specifically Hungary, Yugoslavia, and Czechoslovakia (shown as Russia on the chart). Brazil also appears at the top, as this period marks the peak of its dominance. Germany and Italy also occupy leading positions.
 
 ![Top 10 country for number of wins from 1975 to 1990](plots/top_10_country_for_number_of_wins_from_1975_to_1990.png)
+
 ![Top 10 country for percent of wins from 1975 to 1990](plots/top_10_country_for_percent_of_wins_from_1975_to_1990.png)
 
 The Netherlands recorded the highest number of wins, as they consistently succeeded in qualification tournaments and won Euro 1988. Germany once again placed second, having reached two consecutive World Cup finals (1982 and 1986). In terms of win percentage, Brazil and Germany remained dominant.
 
 ![Top 10 country for number of wins from 1990 to 2005](plots/top_10_country_for_number_of_wins_from_1990_to_2005.png)
+
 ![Top 10 country for percent of wins from 1990 to 2005](plots/top_10_country_for_percent_of_wins_from_1990_to_2005.png)
 
 Mexico’s leadership in total wins may seem surprising, but it is explained by the fact that the Mexican national team plays a very large number of matches each year, often against weaker opponents, allowing them to accumulate many victories. European teams such as the Netherlands, Spain, and Italy traditionally maintain strong results. Brazil ranks second in total wins.
 
 ![Top 10 country for number of wins from 2015 to 2025](plots/top_10_country_for_number_of_wins_from_2015_to_2025.png)
+
 ![Top 10 country for percent of wins from 2015 to 2025](plots/top_10_country_for_percent_of_wins_from_2015_to_2025.png)
 
 The chart covering the period up to the end of 2025 shows that Spain, France, and Belgium are the leading teams of this era. Brazil also achieved a high win percentage.
