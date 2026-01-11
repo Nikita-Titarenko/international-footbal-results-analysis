@@ -6,17 +6,38 @@ import matplotlib.pyplot as plt
 
 plot_dir = 'plots'
 
-def build_barplot(x, y, xlabel, ylabel, title):
+def add_titles(values, axes, orient='v'):
+    offset = max(values) * 0.01
+    
+    for i, v in enumerate(values):
+        display_text = f"{v:.1f}" if isinstance(v, float) else str(v)
+        
+        if orient == 'v':
+            axes.text(i, v + offset, display_text, 
+                      ha='center', va='bottom', fontweight='bold')
+        else:
+            axes.text(v + offset, i, display_text, 
+                      ha='left', va='center', fontweight='bold')
+
+def build_barplot(x, y, xlabel, ylabel, title, orient='v'):
     f = plt.figure(figsize=(12, 6))
-    x_wrapped = [textwrap.fill(name, width=10) for name in x]
-    axes = sns.barplot(x=x_wrapped, y=y)
+    x_wrapped = x
+    y_wrapped = y
+    if orient == 'v':
+         x_wrapped = [textwrap.fill(name, width=10) for name in x]
+    if orient == 'h':
+         y_wrapped = [textwrap.fill(name, width=10) for name in y]
+    
+    axes = sns.barplot(x=x_wrapped, y=y_wrapped, orient=orient)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
     plt.tight_layout()
-    for i, v in enumerate(y):
-            axes.text(i, v + max(y)*0.01, f"{v:.1f}" if isinstance(v, float) else str(v), 
-                    ha='center', va='bottom', fontweight='bold')
+    if orient == 'v':
+             add_titles(y, axes, orient)
+    if orient == 'h':
+             add_titles(x, axes, orient)
+
     save_figure(f, title)
     plt.close(f)
     

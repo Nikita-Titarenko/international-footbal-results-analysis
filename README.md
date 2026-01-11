@@ -21,12 +21,7 @@ Tasks:
 * What trends have there been in international football throughout the ages - home advantage, total goals scored
 * Can we say anything about geopolitics from football fixtures - how has the number of countries changed, which teams like to play each other
 * Which countries host the most matches where they themselves are not participating in
-* How much, if at all, does hosting a major tournament help a country's chances in the tournament
-* Which teams are the most active in playing friendlies and friendly tournaments - does it help or hurt them
-
-Predict:
-
-* Number of goals in the match
+* Which team will win?
 
 ## Who is the best team of all time
 
@@ -157,3 +152,93 @@ From the 1990s onward, a noticeable jump occurs following the collapse of the US
 The chart clearly shows that teams most frequently play against their neighbors. This is logical from a logistical perspective (travel was historically difficult) and due to regional tournaments (Copa América, European Championship, etc.).
 
 Latin America: the leading rivalry is Uruguay vs Argentina (183 matches), as well as Brazil vs Argentina. These are historic clásicos that have existed for over a century. Pairings such as Hungary vs Austria (a legacy of the Austro-Hungarian Empire) and Sweden vs Norway / Denmark represent classic regional derbies.
+
+## How much, if at all, does hosting a major tournament help a country's chances in the tournament
+
+![Top 10 teams that host matches where they themselves are not participating in](plots/top_10_teams_that_host_matches_where_they_themselves_are_not_participating_in.png)
+
+На графіку видно, що Споулчені Штати з величезним відривом займають перше місце. Це пояснюється тим, що в США надзвичайно розвинена спортивна інфраструктура, і там часто проводяться комерційні турніри або товариські матчі топ-клубів Європи. Високі показники Франції (912) та Англії (761) можуть бути пов'язані з проведенням фіналів єврокубків або матчів збірних-сусідів. Південно-Східна Азія: Малайзія (830) та Таїланд (722). Ці країни часто приймають регіональні кубки або передсезонні турніри європейських грандів. Близький Схід: Катар (760) та ОАЕ (601). Це логістичні хаби, які активно інвестують у проведення міжнародних спортивних подій.
+
+## Which team will win?
+
+Для передбачення результату матчу була обрана модель RandomForest, адже вона ідеально підійде для складних зв'язків такі як врахування останніх матчів чи останніх head two head матчів.
+
+Передбачувати ми будемо колонку order_result, де 
+* 1 — перемога тієї команди чия назва за алфавітом наступна; 
+* 0 — нічия;
+* -1 — програш тієї команди чия назва за алфавітом наступна.
+
+```python
+def get_order_result(row):
+    if row['home_score'] == row['away_score']:
+        return 0
+    is_home_win = row['home_score'] > row['away_score']
+    is_home_first = row['home_team'] > row['away_team']
+    return 1 if is_home_win == is_home_first else -1
+
+df['order_result'] = df.apply(get_order_result, axis=1)
+```
+
+Для початку перетворимо команди у каталог, щоб його міг використати RandomForest
+
+```python
+le_team = LabelEncoder()
+    all_teams = pd.concat([df['home_team'], df['away_team']])
+    le_team.fit(all_teams)
+    df['home_team_enc'] = le_team.transform(df['home_team'])
+    df['away_team_enc'] = le_team.transform(df['away_team'])
+```
+
+Далі отримаємо останні h2h матчі:
+
+```python
+def get_h2h_last_wins(df, match_result, last_n):
+    return (
+        df
+        .groupby('home_and_away_team')['order_result']
+        .transform(
+            lambda x: (
+                (x==match_result)
+                .rolling(last_n, min_periods=1)
+                .sum()
+                .shift(1)
+                .fillna(0)
+            )
+        )
+    )
+```
+
+І просто останні матчі команди, перед цим зробивши векторизоване групове транспонування:
+
+```python
+def get_last_wins(df, match_result, last_n):
+    return (
+        df
+        .groupby('team')['result_team']
+        .transform(
+            lambda x: (
+                (x==match_result)
+                .rolling(last_n, min_periods=1)
+                .sum()
+                .shift(1)
+                .fillna(0)
+            )
+        )
+    )
+```
+
+Використаємо RandomForest
+
+```python
+TRAIN_PERCENT = 0.8
+    train_index = int(len(x) * TRAIN_PERCENT)
+    x_train = x.iloc[:train_index]
+    x_test = x.iloc[train_index:]
+    y_train = y.iloc[:train_index]
+    y_test = y.iloc[train_index:]
+    model = RandomForestClassifier(n_estimators=200, random_state=42)
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+```
+
+В результаті бачимо, що Accuracy: 0.5263319357807547. Враховуючи, що ми маємо мінімальну кілкьість даних про матч, це досить непоганий показник.
